@@ -1,3 +1,4 @@
+import { CreateUserDTO } from "../dtos/create_user_dto";
 import { UserService } from "./user_service";
 import { FakeUserRepository } from "../../infrastructure/repositories/fake_user_repository";
 import { User } from "../../domain/entities/user";
@@ -30,5 +31,30 @@ describe("UserService", () => {
     expect(user).not.toBeNull();
     expect(user?.getId()).toBe("3");
     expect(user?.getName()).toBe("Test User");
+  });
+
+  it("deve criar um usuário com sucesso usando um repositorio fake", async () => {
+    const userDTO: CreateUserDTO = {
+      name: "John Doe",
+    }
+
+    const result = await userService.createUser(userDTO);
+
+    expect(result).toBeInstanceOf(User);
+    expect(result.getName()).toBe(userDTO.name);
+
+    const savedUser = await fakeUserRepository.findById(result.getId());
+
+    expect(savedUser).not.toBeNull();
+    expect(savedUser?.getId()).toBe(result.getId());
+    expect(savedUser?.getName()).toBe(result.getName());
+  });
+
+  it("deve retornar um erro ao tentar criar um usuário sem nome", async () => {
+    const dto: CreateUserDTO = {
+      name: "",
+    }
+
+    await expect(() => userService.createUser(dto)).rejects.toThrow(Error("O nome é obrigatório"));
   });
 });
