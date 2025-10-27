@@ -192,4 +192,8 @@ describe("BookingService", () => {
       "Reserva não encontrada."
     );
   });
+
+  it("deve retornar erro ao tentar cancelar uma reserva que não existe", async () => {
+    expect(() => bookingService.cancelBooking("999")).rejects.toThrow("Reserva não encontrada.");
+  });
 });
